@@ -54,6 +54,12 @@ int main() {
     DDPCONbits.JTAGEN = 0;
 
     // do your TRIS and LAT commands here
+    //make pushbutton pin an input pin. Pin number: 11
+    TRISBbits.TRISB4 = 1; //1 for input
+    
+    //make LED pin an output pin that is initially high. Pin number: 12
+    TRISAbits.TRISA4 = 0; //0 for output
+    LATAbits.LATA4 = 1; //1 for initially high
 
     __builtin_enable_interrupts();
 
