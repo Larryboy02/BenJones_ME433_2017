@@ -84,6 +84,11 @@ int main() {
         while(_CP0_GET_COUNT() < 12000){
             ; //do nothing
         }
+        
+        //read pushbutton; if pushed, wait for it to be unpushed before cont'ing
+        while(!PORTBbits.RB4){
+            ;
+        }
     }
     return 0;
 }
