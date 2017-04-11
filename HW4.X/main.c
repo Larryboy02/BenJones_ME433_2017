@@ -1,5 +1,6 @@
 #include <xc.h>           // processor SFR definitions
 #include <sys/attribs.h>  // __ISR macro
+#include <math.h>
 
 // DEVCFG0
 #pragma config DEBUG = OFF // no debugging
@@ -42,31 +43,73 @@
 void setVoltage(char channel, char voltage);
 void SPI_1_init();
 unsigned char SPI_1_io(unsigned char write);
+unsigned char sine_gen(int ii);
+unsigned char sawtooth_gen(int ii);
 
 //does there need to be an interrupt here?
 
 int main(void){
-    //do some stuff here
+    _builtin_disable_interrupts();
+
+    // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
+    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
+
+    // 0 data RAM access wait states
+    BMXCONbits.BMXWSDRM = 0x0;
+
+    // enable multi vector interrupts
+    INTCONbits.MVEC = 0x1;
+
+    // disable JTAG to get pins back
+    DDPCONbits.JTAGEN = 0;
+
+    /*// do your TRIS and LAT commands here
+    //make pushbutton pin an input pin. Pin number: 11
+    TRISBbits.TRISB4 = 1; //1 for input
+    
+    //make LED pin an output pin that is initially high. Pin number: 12
+    TRISAbits.TRISA4 = 0; //0 for output
+    LATAbits.LATA4 = 1; //1 for initially high*/
+
+    __builtin_enable_interrupts();
+
+    while(1) {
+	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
+		  // remember the core timer runs at half the CPU speed
+        _CP0_SET_COUNT(0);
+        
+        while(_CP0_GET_COUNT() < 24000){
+        }
+        
+
+        _CP0_SET_COUNT(0);
+        while(_CP0_GET_COUNT() < 24000){
+            ; //do nothing
+        }
+        
+        //read pushbutton; if pushed, wait for it to be unpushed before cont'ing
+        while(!PORTBbits.RB4){
+            ;
+        }
+    }
+    return 0;
+}
 }
 
 void setVoltage(char channel, char voltage){ //8 bits = 1024
     unsigned char word1, word2;
-    if(channel == 0){
-        //use channel A
-        //VrefA = HI (3.3volts))
-        //do something here with VoutA
-    }
-    else{
-        //use channel B
-        //VrefB = HI (3.3 volts)
-        //do something with VoutB
-        
-        
-    }
+   
+    word1 = 0b00110000;
+    word2 = 0b00000000;
+    
+    word1 += channel<<7; //stick the channel selection bit where it should be
+    word1 += voltage>>4; //stick the first 4 bits of "voltage" into word1
+    word2 += voltage<<4; //stick the second 4 bits of "voltage" into word2
+    
     CS = 0;
     spi_io(word1);
     spi_io(word2);
-    
+    CS = 1;    
 }
 
 void SPI_1_init(void){
@@ -101,4 +144,12 @@ unsigned char spi_io(unsigned char write) {
     ;
   }
   return SPI1BUF;
+}
+
+unsigned char sine_gen(int ii){
+    return (unsigned char)(255*sin((double)(ii)/200));
+}
+
+unsigned char sawtooth_gen(int ii){
+    //not sure what to put here
 }
