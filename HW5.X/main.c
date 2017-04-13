@@ -69,10 +69,10 @@ int main(void){
 	            
         if(getExpander()==0b10000000){ //query the expander state to see if pin
             //G7 has gone HI, indicating a pushbutton switch is pushed
-            setExpander(0,1); //set pin GP0 high
+            setExpander(0,0b1); //set pin GP0 high
         }
         else{
-            setExpander(0,0); //set pin GP0 low
+            setExpander(0,0b0); //set pin GP0 low
         }
     }
     return 0;
@@ -90,7 +90,7 @@ void initExpander(void){
     
     i2c_master_send(SLAVE_ADDR < 1 | 0); //write to MCP23008
     
-    i2c_master_send(00h); //write to register IODIR
+    i2c_master_send(000); //write to register IODIR
     
     i2c_master_send(0b11110000); //configure pins GP0-3 as outputs, 4-7 inputs
     
@@ -100,7 +100,7 @@ void initExpander(void){
     
     i2c_master_send(SLAVE_ADDR < 1 | 0); 
     
-    i2c_master_send(09h); //write to register GPIO
+    i2c_master_send(009); //write to register GPIO
     
     i2c_master_send(0b0000); //make pins 0-3 initially low
     
@@ -113,7 +113,7 @@ void setExpander(char pin, char level){ //"level" should be HI or LO (1 or 0)
     i2c_master_send(SLAVE_ADDR < 1 | 0); //send it to the chip with address
     //"slave_addr", left shifted by 1, or'd with 0 to indicate a write
     
-    i2c_master_send(09h); //write to GPIO register
+    i2c_master_send(009); //write to GPIO register
     
     i2c_master_send(level << pin); 
     
@@ -125,7 +125,7 @@ char getExpander(void){
     
     i2c_master_send(SLAVE_ADDR < 1 | 0); 
     
-    i2c_master_send(09h); //read from GPIO
+    i2c_master_send(009); //read from GPIO
     
     i2c_master_restart(); 
     
