@@ -97,7 +97,7 @@ void initExpander(void){
     i2c_master_stop();
     
     i2c_master_start();
-    
+    //also add in something involving turning on the internal pullup resistors?
     i2c_master_send(SLAVE_ADDR < 1 | 0); 
     
     i2c_master_send(0x09); //write to register GPIO
