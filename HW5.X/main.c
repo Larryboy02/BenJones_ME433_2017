@@ -155,6 +155,7 @@ void i2c_master_setup(void) {
                                     //Pbclk = 48 MHz = 2.08333333333e-8 sec = 20.8333333333333 ns
                                     //Therefore, I2C2BRG = 233 
                                     //Fsck in Hz, Tpgd in sec, Fpb in Hz
+  //I2C2BRG = 0xE9; //hex 233
   I2C2CONbits.ON = 1;               // turn on the I2C2 module
 }
 
